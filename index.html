@@ -148,7 +148,7 @@
             <option>The Review of Economic Studies</option>
           </select>
           <input id="q" type="text"
-            placeholder="Try: minimum wage, microcredit, etc."
+            placeholder="Try: minimum wage, micro credit, etc."
             autocomplete="off" />
           <button id="go" type="submit">Search</button>
         </form>
@@ -194,6 +194,15 @@
     const modeEl = $('#mode');
     const journalEl = $('#journal');
     const themeToggleBtn = document.getElementById('themeToggle');
+
+    // Update placeholder depending on mode (title vs author)
+    function updatePlaceholder(){
+      if (!qEl) return;
+      const isAuthor = modeEl && modeEl.value === 'author';
+      qEl.setAttribute('placeholder', isAuthor
+        ? 'Try: Joachim Voth, David Dorn, etc.'
+        : 'Try: minimum wage, microcredit, etc.');
+    }
 
     function fmtAuthors(authors) {
       if (!Array.isArray(authors) || authors.length === 0) return '—';
@@ -443,6 +452,7 @@
     }
 
     document.getElementById('searchForm').addEventListener('submit', handleSearch);
+    modeEl && modeEl.addEventListener('change', updatePlaceholder);
 
     // --- Theme handling ---
     const THEME_KEY = 'top5econ:theme';
@@ -512,6 +522,10 @@
     // Init theme on load (no default query/search)
     window.addEventListener('load', () => {
       initTheme();
+      // Initialize placeholder according to current mode
+      try {
+        if (typeof updatePlaceholder === 'function') updatePlaceholder();
+      } catch {}
     });
   </script>
   </body>
