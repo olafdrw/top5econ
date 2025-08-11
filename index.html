@@ -84,6 +84,7 @@
     .theme-toggle:hover { background: var(--toggle-hover-bg); }
     .theme-toggle svg { width: 18px; height: 18px; display: block; }
     h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: .2px; }
+    p.tagline { margin: 0 0 8px; color: var(--muted); font-size: 14px; font-style: italic; }
     p.sub { margin: 0 0 18px; color: #9ca3af; font-size: 14px; }
 
     form.search { display: grid; grid-template-columns: auto auto 1fr auto; gap: 10px; margin: 10px 0 4px; }
@@ -156,6 +157,7 @@
       <div class="card">
         <div class="header">
           <h1>Econ Atlas</h1>
+          <p class="tagline">Search the top five economics journals</p>
           <button id="themeToggle" class="theme-toggle"
             aria-label="Switch to dark mode" title="Switch theme"></button>
         </div>
@@ -319,7 +321,8 @@
       if (mode === 'author') {
         params.set('query.author', q);
       } else {
-        params.set('query.title', q);
+        // Use broad bibliographic query so abstracts are included by default
+        params.set('query', q);
       }
       params.set('query.container-title', journalName);
       return params;
