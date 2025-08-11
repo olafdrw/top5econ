@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Top‑5 Econ Journals Search</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <style>
+    :root { --maxw: 900px; }
+    :root.theme-dark {
+      --bg: #0f172a; /* slate-900 */
+      --fg: #e2e8f0; /* slate-200 */
+      --muted: #9ca3af;
+      --muted-strong: #cbd5e1;
+      --card-bg: #111827; /* gray-900 */
+      --card-border: #1f2937; /* gray-800 */
+      --input-bg: #0b1220;
+      --input-border: #334155;
+      --button-bg: #1f2937;
+      --button-border: #334155;
+      --item-bg: #0b1220;
+      --item-border: #1f2937;
+      --meta-fg: #a5b4fc;
+      --badge-bg: #1f2937;
+      --badge-fg: #c7d2fe;
+      --badge-border: #334155;
+      --empty-fg: #94a3b8;
+      --footer-fg: #64748b;
+      --abstract-fg: #cbd5e1;
+      --link-fg: #e2e8f0;
+      --spinner-track: #334155;
+      --spinner-head: #93c5fd;
+      --toggle-bg: transparent;
+      --toggle-border: #334155;
+      --toggle-hover-bg: #1f2937;
+    }
+    :root.theme-light {
+      --bg: #f8fafc; /* slate-50 */
+      --fg: #0f172a; /* slate-900 */
+      --muted: #475569; /* slate-600 */
+      --muted-strong: #1f2937; /* slate-800 */
+      --card-bg: #ffffff;
+      --card-border: #e5e7eb; /* gray-200 */
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1; /* slate-300 */
+      --button-bg: #f1f5f9; /* slate-100 */
+      --button-border: #cbd5e1;
+      --item-bg: #ffffff;
+      --item-border: #e5e7eb;
+      --meta-fg: #4f46e5; /* indigo-600 */
+      --badge-bg: #f1f5f9;
+      --badge-fg: #1f2937;
+      --badge-border: #cbd5e1;
+      --empty-fg: #475569;
+      --footer-fg: #64748b;
+      --abstract-fg: #334155;
+      --link-fg: #0f172a;
+      --spinner-track: #e2e8f0;
+      --spinner-head: #3b82f6; /* blue-500 */
+      --toggle-bg: #f1f5f9;
+      --toggle-border: #cbd5e1;
+      --toggle-hover-bg: #e2e8f0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh; display: grid; place-items: center;
+    }
+    .app { width: min(100%, var(--maxw)); padding: 24px; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    }
+    .header { position: relative; }
+    .theme-toggle {
+      position: absolute; top: -2px; right: -2px; height: 36px; width: 36px;
+      display: grid; place-items: center; border-radius: 999px;
+      background: var(--toggle-bg); border: 1px solid var(--toggle-border);
+      color: var(--fg); cursor: pointer; line-height: 0; padding: 0;
+    }
+    .theme-toggle:hover { background: var(--toggle-hover-bg); }
+    .theme-toggle svg { width: 18px; height: 18px; display: block; }
+    h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: .2px; }
+    p.sub { margin: 0 0 18px; color: #9ca3af; font-size: 14px; }
+
+    form.search { display: grid; grid-template-columns: auto auto 1fr auto; gap: 10px; margin: 10px 0 4px; }
+    input[type="text"]{
+      width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--input-border);
+      background: var(--input-bg); color: var(--fg); font-size: 16px; outline: none;
+    }
+    input[type="text"]::placeholder { color: #64748b; }
+    select {
+      padding: 12px 16px; border-radius: 12px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--fg); font-size: 14px; outline: none;
+    }
+    button { padding: 12px 16px; border-radius: 12px; border: 1px solid var(--button-border); background: var(--button-bg); color: var(--fg); cursor: pointer; font-weight: 600; }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+
+    .status { margin: 12px 2px 0; font-size: 13px; color: var(--muted); min-height: 44px; display: grid; place-items: center; text-align: center; }
+    .status.searching { font-size: 16px; color: var(--muted-strong); display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+    .spinner { width: 18px; height: 18px; border: 3px solid var(--spinner-track); border-top-color: var(--spinner-head); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .results { margin-top: 18px; display: grid; gap: 10px; }
+    .item { padding: 14px; border-radius: 12px; border: 1px solid var(--item-border); background: var(--item-bg); }
+    .item h3 { margin: 0 0 6px; font-size: 16px; line-height: 1.35; }
+    .item h3 a { color: var(--link-fg); text-decoration: none; }
+    .item h3 a:hover { text-decoration: underline; }
+    .meta { font-size: 13px; color: var(--meta-fg); display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge { padding: 2px 8px; border-radius: 999px; background: var(--badge-bg); color: var(--badge-fg); border: 1px solid var(--badge-border); }
+    .badge.author-badge { padding: 2px 8px; font-size: 13px; font-weight: 500; background: var(--badge-bg); color: var(--badge-fg); border-color: var(--badge-border); cursor: pointer; display: inline-block; }
+    .badge.author-badge:hover { text-decoration: underline; }
+    .empty { color: var(--empty-fg); font-style: italic; padding: 20px 0; }
+    footer { margin-top: 14px; font-size: 12px; color: var(--footer-fg); }
+    footer a { color: var(--footer-fg); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    footer .credits { margin-top: 6px; }
+    .abstract { margin-top: 8px; color: var(--abstract-fg); font-size: 14px; line-height: 1.5; }
+    .read-toggle { background: transparent; border: none; color: #93c5fd; cursor: pointer; padding: 0; margin-left: 6px; font-size: 13px; }
+    .read-toggle:hover { text-decoration: underline; }
+  </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="card">
+        <div class="header">
+          <h1>Search the Top 5 Econ Journals</h1>
+          <button id="themeToggle" class="theme-toggle"
+            aria-label="Switch to dark mode" title="Switch theme"></button>
+        </div>
+        <p class="sub">American Economic Review · Econometrica · Journal of
+          Political Economy · Quarterly Journal of Economics · Review of
+          Economic Studies</p>
+
+        <form class="search" id="searchForm">
+          <select id="mode" aria-label="Search by">
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+          </select>
+          <select id="journal" aria-label="Journal">
+            <option value="ALL">All journals</option>
+            <option>American Economic Review</option>
+            <option>Econometrica</option>
+            <option>Journal of Political Economy</option>
+            <option>Quarterly Journal of Economics</option>
+            <option>The Review of Economic Studies</option>
+          </select>
+          <input id="q" type="text"
+            placeholder="Try: minimum wage, microcredit, etc."
+            autocomplete="off" />
+          <button id="go" type="submit">Search</button>
+        </form>
+        <div class="status" id="status"></div>
+
+        <div class="results" id="results"></div>
+
+        <footer>
+          Data via Crossref public API. Only metadata is shown.
+          <div class="credits">Made by <a
+              href="https://olafwillner.com" target="_blank"
+              rel="noopener noreferrer">Olaf de Rohan Willner</a> (2025)</div>
+        </footer>
+      </div>
+    </div>
+
+    <script>
+  'use strict';
+    // --- Config ---
+    const JOURNALS = [
+      { name: "American Economic Review", aliases: ["American Economic Review", "The American Economic Review", "Am. Econ. Rev."] },
+      { name: "Econometrica", aliases: ["Econometrica"] },
+      { name: "Journal of Political Economy", aliases: ["Journal of Political Economy", "The Journal of Political Economy", "J Polit Econ", "J. Polit. Econ."] },
+      { name: "Quarterly Journal of Economics", aliases: ["Quarterly Journal of Economics", "The Quarterly Journal of Economics", "Q J Econ", "Q. J. Econ."] },
+      { name: "The Review of Economic Studies", aliases: ["Review of Economic Studies", "The Review of Economic Studies", "Rev Econ Stud", "Rev. Econ. Stud."] },
+    ];
+
+    const CROSSREF_ENDPOINT = 'https://api.crossref.org/works';
+    const ROWS_PER_JOURNAL = 20; // tune if needed
+
+    const $ = sel => document.querySelector(sel);
+    const statusEl = $('#status');
+    const resultsEl = $('#results');
+    const qEl = $('#q');
+    const goBtn = $('#go');
+    const modeEl = $('#mode');
+    const journalEl = $('#journal');
+    const themeToggleBtn = document.getElementById('themeToggle');
+
+    function fmtAuthors(authors) {
+      if (!Array.isArray(authors) || authors.length === 0) return '—';
+      const names = authors.map(a => {
+        const given = a.given ? a.given : '';
+        const family = a.family ? a.family : '';
+        return (family && given) ? `${family}, ${given}` : (family || given || '').trim();
+      }).filter(Boolean);
+      if (names.length <= 6) return names.join('; ');
+      return names.slice(0,6).join('; ') + ` et al.`;
+    }
+
+    function fmtDate(issued) {
+      // Crossref: { 'date-parts': [[YYYY, MM?, DD?]] }
+      const dp = issued && issued['date-parts'] && issued['date-parts'][0];
+      if (!dp) return '—';
+      const [y, m, d] = dp;
+      const mm = m ? String(m).padStart(2, '0') : '01';
+      const dd = d ? String(d).padStart(2, '0') : '01';
+      try {
+        // Valid date even when only year or year-month provided
+        if (d) return `${y}-${mm}-${dd}`;
+        if (m) return `${y}-${mm}`;
+        return String(y);
+      } catch {
+        return String(y || '—');
+      }
+    }
+
+    function normalizeJournalName(containerTitle) {
+      if (!containerTitle) return '';
+      const title = Array.isArray(containerTitle) ? (containerTitle[0] || '') : containerTitle;
+      const t = title.toLowerCase().trim();
+      for (const j of JOURNALS) {
+        for (const a of j.aliases) {
+          if (t === a.toLowerCase()) return j.name;
+        }
+        if (t === j.name.toLowerCase()) return j.name;
+      }
+      return title; // fallback for display only
+    }
+
+    const ALLOWED_TITLES = new Set(JOURNALS.flatMap(j => [j.name, ...j.aliases].map(s => s.toLowerCase())));
+    const JOURNAL_COLORS = {
+      'American Economic Review': { bg: '#fce8e8', text: '#7f1d1d', border: '#f5b5b5' },   // soft crimson
+      'Econometrica': { bg: '#e7f0ff', text: '#1e3a8a', border: '#b7d1ff' },                // soft blue
+      'Journal of Political Economy': { bg: '#f4e7e7', text: '#5b0f0f', border: '#e0b3b3' }, // maroon tint
+      'Quarterly Journal of Economics': { bg: '#fff4d6', text: '#7a5200', border: '#f7d08a' }, // sand/gold
+      'The Review of Economic Studies': { bg: '#e6f7ec', text: '#0f5132', border: '#bfe6cc' }  // green
+    };
+    function isFromAllowedJournal(item) {
+      const ct = item && item['container-title'];
+      if (!ct) return false;
+      const arr = Array.isArray(ct) ? ct : [ct];
+      return arr.some(t => ALLOWED_TITLES.has(String(t).toLowerCase().trim()));
+    }
+
+    // Safer tokenization for author matching
+    function tokens(q){
+      let s = String(q||'').toLowerCase().trim();
+      const seps = ['-', '–', '—', '_', '/', ',', '.', '\\t', '\\n'];
+      for (const ch of seps) { s = s.split(ch).join(' '); }
+      return s.split(/\s+/).filter(Boolean);
+    }
+    function authorMatches(item, q){
+      const ts = tokens(q);
+      if (!ts.length) return true;
+      if (!item || !Array.isArray(item.author)) return false;
+      return item.author.some(a => {
+        const name = (`${a.given||''} ${a.family||''}`).toLowerCase();
+        return ts.every(t => name.includes(t));
+      });
+    }
+
+    // Build Crossref params separately (testable without network)
+    function buildCrossrefParams(q, journalName, mode){
+      const params = new URLSearchParams({
+        filter: 'type:journal-article',
+        rows: String(ROWS_PER_JOURNAL),
+        select: 'title,author,container-title,URL,issued,DOI,abstract',
+        sort: 'score',
+        order: 'desc',
+        mailto: 'contact@example.com'
+      });
+      if (mode === 'author') {
+        params.set('query.author', q);
+      } else {
+        params.set('query.title', q);
+      }
+      params.set('query.container-title', journalName);
+      return params;
+    }
+
+    async function searchCrossrefForJournal(q, journalName, mode) {
+      const params = buildCrossrefParams(q, journalName, mode);
+      const url = `${CROSSREF_ENDPOINT}?${params.toString()}`;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      return (data.message && data.message.items) ? data.message.items : [];
+    }
+
+    function dedupeByDOI(items) {
+      const seen = new Set();
+      const out = [];
+      for (const it of items) {
+        const key = (it.DOI || it.URL || JSON.stringify(it.title)).toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(it);
+      }
+      return out;
+    }
+
+    function escapeHTML(s) {
+      const div = document.createElement('div');
+      div.textContent = String(s ?? '');
+      return div.innerHTML;
+    }
+
+    function stripLeadingAbstractLabel(text){
+      return String(text || '').replace(/^\s*abstract\s*[:.\-–—]?\s*/i, '');
+    }
+
+    function getAbstractText(raw) {
+      if (!raw) return '';
+      try {
+        const container = document.createElement('div');
+        container.innerHTML = String(raw);
+        const text = container.textContent || container.innerText || '';
+        return stripLeadingAbstractLabel(text).replace(/\s+/g, ' ').trim();
+      } catch {
+        return stripLeadingAbstractLabel(String(raw)).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      }
+    }
+
+    function splitAbstract(fullText) {
+      const text = String(fullText || '').trim();
+      if (!text) return { preview: '', rest: '' };
+      const newlineIndex = text.indexOf('\n');
+      if (newlineIndex >= 0) {
+        const firstLine = text.slice(0, newlineIndex).trim();
+        const rest = text.slice(newlineIndex).trim();
+        return { preview: firstLine, rest };
+      }
+      const match = text.match(/(.+?[.!?])(\s+|$)/);
+      if (match) {
+        const firstSentence = match[1].trim();
+        const rest = text.slice(firstSentence.length).trim();
+        return { preview: firstSentence, rest };
+      }
+      return { preview: text, rest: '' };
+    }
+
+    function renderResults(items, q) {
+      resultsEl.innerHTML = '';
+      if (!items || items.length === 0) {
+        const div = document.createElement('div');
+        div.className = 'empty';
+        div.textContent = `No results for "${q}" in the selected journals.`;
+        resultsEl.appendChild(div);
+        return;
+      }
+
+      for (const it of items) {
+        const title = Array.isArray(it.title) ? (it.title[0] || '(untitled)') : (it.title || '(untitled)');
+        const url = it.URL || (it.DOI ? `https://doi.org/${it.DOI}` : '#');
+        const authorsArr = Array.isArray(it.author) ? it.author : [];
+        const authorBadges = authorsArr.map(a => {
+          const given = a && a.given ? a.given : '';
+          const family = a && a.family ? a.family : '';
+          const display = (family && given) ? `${family}, ${given}` : (family || given || '').trim();
+          const query = (given && family) ? `${given} ${family}` : (given || family || '').trim();
+          const safeDisplay = escapeHTML(display || '—');
+          const safeQuery = escapeHTML(query || '');
+          return `<button type="button" class="badge author-badge" data-author="${safeQuery}" title="Search by author: ${safeDisplay}">${safeDisplay}</button>`;
+        }).join(' ');
+        const journal = normalizeJournalName(it['container-title']);
+        const date = fmtDate(it.issued);
+        const jc = JOURNAL_COLORS[journal];
+        const journalStyle = jc ? `style="background:${jc.bg}; color:${jc.text}; border-color:${jc.border};"` : '';
+        const abstractText = getAbstractText(it.abstract);
+        const parts = splitAbstract(abstractText);
+
+        const row = document.createElement('div');
+        row.className = 'item';
+        row.innerHTML = `
+          <h3><a href="${url}" target="_blank" rel="noopener noreferrer">${title}</a></h3>
+          <div class="meta">
+            ${authorBadges || '<span class="badge" title="Authors">—</span>'}
+            <span class="badge" title="Journal" ${journalStyle}>${journal || '—'}</span>
+            <span class="badge" title="Date">${date}</span>
+          </div>
+          ${abstractText ? `
+          <div class="abstract">
+            <span class="abstract-preview">${escapeHTML(parts.preview)}</span>
+            ${parts.rest ? `<span class="abstract-ellipsis">…</span><span class="abstract-full" style="display:none;"> ${escapeHTML(parts.rest)}</span> <button class="read-toggle" type="button">Read more</button>` : ''}
+          </div>
+          ` : `
+          <div class="abstract" style="color:#94a3b8; font-style:italic;">Abstract not available from Crossref.</div>
+          `}
+        `;
+        resultsEl.appendChild(row);
+      }
+    }
+
+    async function handleSearch(e) {
+      e && e.preventDefault();
+      const q = qEl.value.trim();
+      if (!q) {
+        statusEl.textContent = 'Type a search query to begin.';
+        return;
+      }
+      goBtn.disabled = true;
+      statusEl.innerHTML = '<div class="status searching"><div class="spinner"></div><span>Searching…</span></div>';
+      resultsEl.innerHTML = '';
+
+      try {
+        const all = [];
+        const mode = modeEl.value;
+        const selected = journalEl.value;
+        const pool = (selected === 'ALL') ? JOURNALS : JOURNALS.filter(j => j.name === selected);
+        const promises = pool.map(j => searchCrossrefForJournal(q, j.name, mode));
+        const arrays = await Promise.allSettled(promises);
+        for (const res of arrays) {
+          if (res.status === 'fulfilled') all.push(...res.value);
+        }
+        let items = dedupeByDOI(all).filter(isFromAllowedJournal);
+        if (mode === 'author') items = items.filter(it => authorMatches(it, q));
+        // Sort primarily by date (desc), fallback to title
+        items.sort((a,b) => {
+          const adp = a.issued && a.issued['date-parts'] && a.issued['date-parts'][0] || [];
+          const bdp = b.issued && b.issued['date-parts'] && b.issued['date-parts'][0] || [];
+          const ad = new Date(`${adp[0]||0}-${String(adp[1]||1).padStart(2,'0')}-${String(adp[2]||1).padStart(2,'0')}`);
+          const bd = new Date(`${bdp[0]||0}-${String(bdp[1]||1).padStart(2,'0')}-${String(bdp[2]||1).padStart(2,'0')}`);
+          return bd - ad;
+        });
+
+        renderResults(items, q);
+        statusEl.textContent = `Showing ${items.length} result${items.length===1?'':'s'} for “${q}”.`;
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'There was an error fetching results. (CORS or network?)';
+      } finally {
+        goBtn.disabled = false;
+      }
+    }
+
+    document.getElementById('searchForm').addEventListener('submit', handleSearch);
+
+    // --- Theme handling ---
+    const THEME_KEY = 'top5econ:theme';
+    function applyTheme(theme){
+      const root = document.documentElement;
+      root.classList.remove('theme-dark','theme-light');
+      root.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
+      if (themeToggleBtn) {
+        const isLight = theme === 'light';
+        themeToggleBtn.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+        themeToggleBtn.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+        themeToggleBtn.innerHTML = isLight
+          ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
+          : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42m12.72-12.72 1.42-1.42"/></g></svg>`;
+      }
+    }
+    function getSystemPref(){
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
+    function initTheme(){
+      const saved = localStorage.getItem(THEME_KEY);
+      applyTheme(saved || getSystemPref());
+    }
+    function toggleTheme(){
+      const isLight = document.documentElement.classList.contains('theme-light');
+      const next = isLight ? 'dark' : 'light';
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme(next);
+    }
+    themeToggleBtn && themeToggleBtn.addEventListener('click', toggleTheme);
+
+    // Toggle Read more/less via event delegation
+    resultsEl.addEventListener('click', (e) => {
+      const btn = e.target && e.target.closest('.read-toggle');
+      if (!btn) return;
+      const container = btn.closest('.abstract');
+      if (!container) return;
+      const full = container.querySelector('.abstract-full');
+      const ellipsis = container.querySelector('.abstract-ellipsis');
+      if (!full) return;
+      const isHidden = full.style.display === 'none' || full.style.display === '';
+      if (isHidden) {
+        full.style.display = 'inline';
+        if (ellipsis) ellipsis.style.display = 'none';
+        btn.textContent = 'Read less';
+      } else {
+        full.style.display = 'none';
+        if (ellipsis) ellipsis.style.display = 'inline';
+        btn.textContent = 'Read more';
+      }
+      // Ensure the button is positioned at the end of the abstract content
+      container.appendChild(btn);
+    });
+
+    // Author badge click -> search by author
+    resultsEl.addEventListener('click', (e) => {
+      const authorBtn = e.target && e.target.closest('.author-badge');
+      if (!authorBtn) return;
+      const authorName = authorBtn.getAttribute('data-author') || '';
+      if (!authorName) return;
+      // switch to author mode and set query
+      if (modeEl) modeEl.value = 'author';
+      if (qEl) qEl.value = authorName;
+      handleSearch();
+    });
+
+    // Init theme on load (no default query/search)
+    window.addEventListener('load', () => {
+      initTheme();
+    });
+  </script>
+  </body>
+</html>
