@@ -145,10 +145,11 @@
       
       .item h3 { font-size: 15px; }
       .meta { font-size: 12px; gap: 6px; }
-      .badge { padding: 2px 6px; }
+      .badge { padding: 1px 6px; line-height: 1.2; }
+      .badge.author-badge { padding: 1px 6px; font-size: 12px; line-height: 1.2; }
       
-      /* Ensure comfortable tap targets (exclude theme toggle) */
-      input[type="text"], select, button:not(.theme-toggle) { min-height: 44px; }
+      /* Ensure comfortable tap targets for form controls; exclude pill buttons */
+      input[type="text"], select, button:not(.theme-toggle):not(.author-badge):not(.read-toggle) { min-height: 44px; }
     }
   </style>
   </head>
